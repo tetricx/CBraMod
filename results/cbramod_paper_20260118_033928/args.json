@@ -1,0 +1,16 @@
+{
+  "data_path": "C:\\mnt\\user-data\\outputs\\cbramod_data_official",
+  "batch_size": 32,
+  "num_workers": 4,
+  "pretrained_path": "pretrained_weights/pretrained_weights.pth",
+  "use_pretrained": true,
+  "epochs": 50,
+  "lr": 1e-05,
+  "weight_decay": 0.05,
+  "dropout": 0.1,
+  "clip_value": 1.0,
+  "device": "cuda",
+  "save_dir": "./results",
+  "experiment_name": "cbramod_paper_20260118_033928",
+  "seed": 42
+}

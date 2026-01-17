@@ -53,10 +53,10 @@ class Model(nn.Module):
         elif param.classifier == 'all_patch_reps':
             self.classifier = nn.Sequential(
                 Rearrange('b c s d -> b (c s d)'),
-                nn.Linear(19*2*200, 2*200),
+                nn.Linear(60*1*200, 1*200),
                 nn.ELU(),
                 nn.Dropout(param.dropout),
-                nn.Linear(2*200, 200),
+                nn.Linear(1*200, 200),
                 nn.ELU(),
                 nn.Dropout(param.dropout),
                 nn.Linear(200, 1),

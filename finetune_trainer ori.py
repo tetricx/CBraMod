@@ -6,7 +6,6 @@ import numpy as np
 import torch
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss, MSELoss
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 from finetune_evaluator import Evaluator
 
@@ -67,150 +66,11 @@ class Trainer(object):
         )
         print(self.model)
 
-    def plot_training_curves(self, history, task_type, save_path):
-        """
-        Plot training curves based on task type.
-        
-        Args:
-            history: Dictionary containing training history
-            task_type: 'multiclass', 'binaryclass', or 'regression'
-            save_path: Path to save the plot
-        """
-        epochs = range(1, len(history['train_loss']) + 1)
-        
-        if task_type == 'multiclass':
-            fig, axes = plt.subplots(2, 2, figsize=(15, 10))
-            
-            # Training Loss
-            axes[0, 0].plot(epochs, history['train_loss'], 'b-', label='Training Loss')
-            axes[0, 0].set_xlabel('Epoch')
-            axes[0, 0].set_ylabel('Loss')
-            axes[0, 0].set_title('Training Loss')
-            axes[0, 0].legend()
-            axes[0, 0].grid(True)
-            
-            # Accuracy
-            axes[0, 1].plot(epochs, history['val_acc'], 'g-', label='Validation Accuracy')
-            axes[0, 1].axhline(y=history['best_acc'], color='r', linestyle='--', label=f'Best: {history["best_acc"]:.4f}')
-            axes[0, 1].set_xlabel('Epoch')
-            axes[0, 1].set_ylabel('Accuracy')
-            axes[0, 1].set_title('Validation Accuracy')
-            axes[0, 1].legend()
-            axes[0, 1].grid(True)
-            
-            # Kappa
-            axes[1, 0].plot(epochs, history['val_kappa'], 'orange', label='Validation Kappa')
-            axes[1, 0].axhline(y=history['best_kappa'], color='r', linestyle='--', label=f'Best: {history["best_kappa"]:.4f}')
-            axes[1, 0].set_xlabel('Epoch')
-            axes[1, 0].set_ylabel('Kappa')
-            axes[1, 0].set_title('Validation Kappa')
-            axes[1, 0].legend()
-            axes[1, 0].grid(True)
-            
-            # F1 Score
-            axes[1, 1].plot(epochs, history['val_f1'], 'purple', label='Validation F1')
-            axes[1, 1].axhline(y=history['best_f1'], color='r', linestyle='--', label=f'Best: {history["best_f1"]:.4f}')
-            axes[1, 1].set_xlabel('Epoch')
-            axes[1, 1].set_ylabel('F1 Score')
-            axes[1, 1].set_title('Validation F1 Score')
-            axes[1, 1].legend()
-            axes[1, 1].grid(True)
-            
-        elif task_type == 'binaryclass':
-            fig, axes = plt.subplots(2, 2, figsize=(15, 10))
-            
-            # Training Loss
-            axes[0, 0].plot(epochs, history['train_loss'], 'b-', label='Training Loss')
-            axes[0, 0].set_xlabel('Epoch')
-            axes[0, 0].set_ylabel('Loss')
-            axes[0, 0].set_title('Training Loss')
-            axes[0, 0].legend()
-            axes[0, 0].grid(True)
-            
-            # Accuracy
-            axes[0, 1].plot(epochs, history['val_acc'], 'g-', label='Validation Accuracy')
-            axes[0, 1].axhline(y=history['best_acc'], color='r', linestyle='--', label=f'Best: {history["best_acc"]:.4f}')
-            axes[0, 1].set_xlabel('Epoch')
-            axes[0, 1].set_ylabel('Accuracy')
-            axes[0, 1].set_title('Validation Accuracy')
-            axes[0, 1].legend()
-            axes[0, 1].grid(True)
-            
-            # PR AUC
-            axes[1, 0].plot(epochs, history['val_pr_auc'], 'orange', label='Validation PR AUC')
-            axes[1, 0].axhline(y=history['best_pr_auc'], color='r', linestyle='--', label=f'Best: {history["best_pr_auc"]:.4f}')
-            axes[1, 0].set_xlabel('Epoch')
-            axes[1, 0].set_ylabel('PR AUC')
-            axes[1, 0].set_title('Validation PR AUC')
-            axes[1, 0].legend()
-            axes[1, 0].grid(True)
-            
-            # ROC AUC
-            axes[1, 1].plot(epochs, history['val_roc_auc'], 'purple', label='Validation ROC AUC')
-            axes[1, 1].axhline(y=history['best_roc_auc'], color='r', linestyle='--', label=f'Best: {history["best_roc_auc"]:.4f}')
-            axes[1, 1].set_xlabel('Epoch')
-            axes[1, 1].set_ylabel('ROC AUC')
-            axes[1, 1].set_title('Validation ROC AUC')
-            axes[1, 1].legend()
-            axes[1, 1].grid(True)
-            
-        elif task_type == 'regression':
-            fig, axes = plt.subplots(2, 2, figsize=(15, 10))
-            
-            # Training Loss
-            axes[0, 0].plot(epochs, history['train_loss'], 'b-', label='Training Loss')
-            axes[0, 0].set_xlabel('Epoch')
-            axes[0, 0].set_ylabel('Loss')
-            axes[0, 0].set_title('Training Loss')
-            axes[0, 0].legend()
-            axes[0, 0].grid(True)
-            
-            # Correlation Coefficient
-            axes[0, 1].plot(epochs, history['val_corrcoef'], 'g-', label='Validation CorrCoef')
-            axes[0, 1].axhline(y=history['best_corrcoef'], color='r', linestyle='--', label=f'Best: {history["best_corrcoef"]:.4f}')
-            axes[0, 1].set_xlabel('Epoch')
-            axes[0, 1].set_ylabel('Correlation Coefficient')
-            axes[0, 1].set_title('Validation Correlation Coefficient')
-            axes[0, 1].legend()
-            axes[0, 1].grid(True)
-            
-            # R² Score
-            axes[1, 0].plot(epochs, history['val_r2'], 'orange', label='Validation R²')
-            axes[1, 0].axhline(y=history['best_r2'], color='r', linestyle='--', label=f'Best: {history["best_r2"]:.4f}')
-            axes[1, 0].set_xlabel('Epoch')
-            axes[1, 0].set_ylabel('R² Score')
-            axes[1, 0].set_title('Validation R² Score')
-            axes[1, 0].legend()
-            axes[1, 0].grid(True)
-            
-            # RMSE
-            axes[1, 1].plot(epochs, history['val_rmse'], 'purple', label='Validation RMSE')
-            axes[1, 1].axhline(y=history['best_rmse'], color='r', linestyle='--', label=f'Best: {history["best_rmse"]:.4f}')
-            axes[1, 1].set_xlabel('Epoch')
-            axes[1, 1].set_ylabel('RMSE')
-            axes[1, 1].set_title('Validation RMSE')
-            axes[1, 1].legend()
-            axes[1, 1].grid(True)
-        
-        plt.tight_layout()
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"Training plot saved to {save_path}")
-        plt.close()
-
     def train_for_multiclass(self):
         f1_best = 0
         kappa_best = 0
         acc_best = 0
         cm_best = None
-        
-        # History tracking
-        history = {
-            'train_loss': [],
-            'val_acc': [],
-            'val_kappa': [],
-            'val_f1': []
-        }
-        
         for epoch in range(self.params.epochs):
             self.model.train()
             start_time = timer()
@@ -229,23 +89,18 @@ class Trainer(object):
                 losses.append(loss.data.cpu().numpy())
                 if self.params.clip_value > 0:
                     torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.params.clip_value)
+                    # torch.nn.utils.clip_grad_value_(self.model.parameters(), self.params.clip_value)
                 self.optimizer.step()
                 self.optimizer_scheduler.step()
 
             optim_state = self.optimizer.state_dict()
-            epoch_loss = np.mean(losses)
-            history['train_loss'].append(epoch_loss)
 
             with torch.no_grad():
                 acc, kappa, f1, cm = self.val_eval.get_metrics_for_multiclass(self.model)
-                history['val_acc'].append(acc)
-                history['val_kappa'].append(kappa)
-                history['val_f1'].append(f1)
-                
                 print(
                     "Epoch {} : Training Loss: {:.5f}, acc: {:.5f}, kappa: {:.5f}, f1: {:.5f}, LR: {:.5f}, Time elapsed {:.2f} mins".format(
                         epoch + 1,
-                        epoch_loss,
+                        np.mean(losses),
                         acc,
                         kappa,
                         f1,
@@ -267,12 +122,6 @@ class Trainer(object):
                     f1_best = f1
                     cm_best = cm
                     self.best_model_states = copy.deepcopy(self.model.state_dict())
-        
-        # Add best metrics to history for plotting
-        history['best_acc'] = acc_best
-        history['best_kappa'] = kappa_best
-        history['best_f1'] = f1_best
-        
         self.model.load_state_dict(self.best_model_states)
         with torch.no_grad():
             print("***************************Test************************")
@@ -291,25 +140,12 @@ class Trainer(object):
             model_path = self.params.model_dir + "/epoch{}_acc_{:.5f}_kappa_{:.5f}_f1_{:.5f}.pth".format(best_f1_epoch, acc, kappa, f1)
             torch.save(self.model.state_dict(), model_path)
             print("model save in " + model_path)
-            
-            # Generate and save training plot
-            plot_path = self.params.model_dir + "/training_plot_multiclass.png"
-            self.plot_training_curves(history, 'multiclass', plot_path)
 
     def train_for_binaryclass(self):
         acc_best = 0
         roc_auc_best = 0
         pr_auc_best = 0
         cm_best = None
-        
-        # History tracking
-        history = {
-            'train_loss': [],
-            'val_acc': [],
-            'val_pr_auc': [],
-            'val_roc_auc': []
-        }
-        
         for epoch in range(self.params.epochs):
             self.model.train()
             start_time = timer()
@@ -326,23 +162,18 @@ class Trainer(object):
                 losses.append(loss.data.cpu().numpy())
                 if self.params.clip_value > 0:
                     torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.params.clip_value)
+                    # torch.nn.utils.clip_grad_value_(self.model.parameters(), self.params.clip_value)
                 self.optimizer.step()
                 self.optimizer_scheduler.step()
 
             optim_state = self.optimizer.state_dict()
-            epoch_loss = np.mean(losses)
-            history['train_loss'].append(epoch_loss)
 
             with torch.no_grad():
                 acc, pr_auc, roc_auc, cm = self.val_eval.get_metrics_for_binaryclass(self.model)
-                history['val_acc'].append(acc)
-                history['val_pr_auc'].append(pr_auc)
-                history['val_roc_auc'].append(roc_auc)
-                
                 print(
                     "Epoch {} : Training Loss: {:.5f}, acc: {:.5f}, pr_auc: {:.5f}, roc_auc: {:.5f}, LR: {:.5f}, Time elapsed {:.2f} mins".format(
                         epoch + 1,
-                        epoch_loss,
+                        np.mean(losses),
                         acc,
                         pr_auc,
                         roc_auc,
@@ -364,12 +195,6 @@ class Trainer(object):
                     roc_auc_best = roc_auc
                     cm_best = cm
                     self.best_model_states = copy.deepcopy(self.model.state_dict())
-        
-        # Add best metrics to history for plotting
-        history['best_acc'] = acc_best
-        history['best_pr_auc'] = pr_auc_best
-        history['best_roc_auc'] = roc_auc_best
-        
         self.model.load_state_dict(self.best_model_states)
         with torch.no_grad():
             print("***************************Test************************")
@@ -388,24 +213,11 @@ class Trainer(object):
             model_path = self.params.model_dir + "/epoch{}_acc_{:.5f}_pr_{:.5f}_roc_{:.5f}.pth".format(best_f1_epoch, acc, pr_auc, roc_auc)
             torch.save(self.model.state_dict(), model_path)
             print("model save in " + model_path)
-            
-            # Generate and save training plot
-            plot_path = self.params.model_dir + "/training_plot_binaryclass.png"
-            self.plot_training_curves(history, 'binaryclass', plot_path)
 
     def train_for_regression(self):
         corrcoef_best = 0
         r2_best = 0
         rmse_best = 0
-        
-        # History tracking
-        history = {
-            'train_loss': [],
-            'val_corrcoef': [],
-            'val_r2': [],
-            'val_rmse': []
-        }
-        
         for epoch in range(self.params.epochs):
             self.model.train()
             start_time = timer()
@@ -421,23 +233,18 @@ class Trainer(object):
                 losses.append(loss.data.cpu().numpy())
                 if self.params.clip_value > 0:
                     torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.params.clip_value)
+                    # torch.nn.utils.clip_grad_value_(self.model.parameters(), self.params.clip_value)
                 self.optimizer.step()
                 self.optimizer_scheduler.step()
 
             optim_state = self.optimizer.state_dict()
-            epoch_loss = np.mean(losses)
-            history['train_loss'].append(epoch_loss)
 
             with torch.no_grad():
                 corrcoef, r2, rmse = self.val_eval.get_metrics_for_regression(self.model)
-                history['val_corrcoef'].append(corrcoef)
-                history['val_r2'].append(r2)
-                history['val_rmse'].append(rmse)
-                
                 print(
                     "Epoch {} : Training Loss: {:.5f}, corrcoef: {:.5f}, r2: {:.5f}, rmse: {:.5f}, LR: {:.5f}, Time elapsed {:.2f} mins".format(
                         epoch + 1,
-                        epoch_loss,
+                        np.mean(losses),
                         corrcoef,
                         r2,
                         rmse,
@@ -458,11 +265,6 @@ class Trainer(object):
                     rmse_best = rmse
                     self.best_model_states = copy.deepcopy(self.model.state_dict())
 
-        # Add best metrics to history for plotting
-        history['best_corrcoef'] = corrcoef_best
-        history['best_r2'] = r2_best
-        history['best_rmse'] = rmse_best
-        
         self.model.load_state_dict(self.best_model_states)
         with torch.no_grad():
             print("***************************Test************************")
@@ -481,7 +283,3 @@ class Trainer(object):
             model_path = self.params.model_dir + "/epoch{}_corrcoef_{:.5f}_r2_{:.5f}_rmse_{:.5f}.pth".format(best_r2_epoch, corrcoef, r2, rmse)
             torch.save(self.model.state_dict(), model_path)
             print("model save in " + model_path)
-            
-            # Generate and save training plot
-            plot_path = self.params.model_dir + "/training_plot_regression.png"
-            self.plot_training_curves(history, 'regression', plot_path)
